@@ -873,6 +873,8 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
   final DateTime minValue, maxValue;
   /// jump minutes, user could select time in intervals of 30min, 5mins, etc....
   final int minuteInterval;
+  /// user could set a fixed minute (only one minute item)
+  final String fixedMinute;
   /// Year, month, day suffix
   final String yearSuffix, monthSuffix, daySuffix;
   /// use two-digit year, 2019, displayed as 19
@@ -925,6 +927,7 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
     this.monthSuffix,
     this.daySuffix,
     this.minuteInterval,
+    this.fixedMinute,
     this.customColumnType,
     this.twoDigitYear = false,
   }) : assert (minuteInterval == null || (minuteInterval >= 1 && minuteInterval <= 30 && (60 % minuteInterval == 0))) {
@@ -1014,6 +1017,10 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
         return v ~/ minuteInterval;
       }
     }
+    // only one item
+    if(fixedMinute != null && v == 60) {
+      return 1;
+    }
     return v;
   }
 
@@ -1075,7 +1082,11 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
         if (minuteInterval == null || minuteInterval < 2)
           _text = "${intToStr(index)}";
         else
-          _text = "${intToStr(index * minuteInterval)}";
+          if(fixedMinute != null) {
+            _text = fixedMinute;
+          }else {
+            _text = "${intToStr(index * minuteInterval)}";
+          }
         break;
       case 6:
         List _ampm = strAMPM ?? PickerLocalizations.of(context).ampm;
@@ -1125,6 +1136,8 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
           break;
         case 4:
           picker.selecteds[i] = minuteInterval == null || minuteInterval < 2 ? value.minute : value.minute ~/ minuteInterval;
+          // fixedMinute index = 0
+          if(fixedMinute != null) picker.selecteds[i] = 0;
           break;
         case 5:
           picker.selecteds[i] = value.second;
