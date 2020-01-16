@@ -873,8 +873,8 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
   final DateTime minValue, maxValue;
   /// jump minutes, user could select time in intervals of 30min, 5mins, etc....
   final int minuteInterval;
-  /// user could set a fixed minute (only one minute item)
-  final String fixedMinute;
+  /// minutes and seconds will be set '00'
+  final bool enableZeroMS;
   /// Year, month, day suffix
   final String yearSuffix, monthSuffix, daySuffix;
   /// use two-digit year, 2019, displayed as 19
@@ -927,7 +927,7 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
     this.monthSuffix,
     this.daySuffix,
     this.minuteInterval,
-    this.fixedMinute,
+    this.enableZeroMS = false,
     this.customColumnType,
     this.twoDigitYear = false,
   }) : assert (minuteInterval == null || (minuteInterval >= 1 && minuteInterval <= 30 && (60 % minuteInterval == 0))) {
@@ -935,6 +935,9 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
     _yearBegin = yearBegin;
     if (minValue != null && minValue.year > _yearBegin) {
       _yearBegin = minValue.year;
+    }
+    if(enableZeroMS == true) {
+      value = new DateTime(value.year, value.month, value.day, value.hour);
     }
   }
 
@@ -1018,7 +1021,7 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
       }
     }
     // only one item
-    if(fixedMinute != null && v == 60) {
+    if(enableZeroMS == true && v == 60) {
       return 1;
     }
     return v;
@@ -1075,22 +1078,12 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
         _text = "${index + 1}${_checkStr(daySuffix)}";
         break;
       case 3:
-        _text = "${intToStr(index)}";
-        break;
       case 5:
-        if(fixedMinute != null) {
-          _text = fixedMinute;
-        }else {
-          _text = "${intToStr(index)}";
-        }
+        _text = "${intToStr(index)}";
         break;
       case 4:
         if (minuteInterval == null || minuteInterval < 2)
-          if(fixedMinute != null) {
-            _text = fixedMinute;
-          }else {
-            _text = "${intToStr(index)}";
-          }
+          _text = "${intToStr(index)}";
         else
           _text = "${intToStr(index * minuteInterval)}";
         break;
@@ -1142,12 +1135,12 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
           break;
         case 4:
           picker.selecteds[i] = minuteInterval == null || minuteInterval < 2 ? value.minute : value.minute ~/ minuteInterval;
-          // fixedMinute index = 0
-          if(fixedMinute != null) picker.selecteds[i] = 0;
+          // enableZeroMS index = 0
+          if(enableZeroMS == true) picker.selecteds[i] = 0;
           break;
         case 5:
           picker.selecteds[i] = value.second;
-          if(fixedMinute != null) picker.selecteds[i] = 0;
+          if(enableZeroMS == true) picker.selecteds[i] = 0;
           break;
         case 6:
           picker.selecteds[i] = (value.hour > 12 || value.hour == 0) ? 1 : 0;
