@@ -1075,8 +1075,14 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
         _text = "${index + 1}${_checkStr(daySuffix)}";
         break;
       case 3:
-      case 5:
         _text = "${intToStr(index)}";
+        break;
+      case 5:
+        if(fixedMinute != null) {
+          _text = fixedMinute;
+        }else {
+          _text = "${intToStr(index)}";
+        }
         break;
       case 4:
         if (minuteInterval == null || minuteInterval < 2)
@@ -1141,6 +1147,7 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
           break;
         case 5:
           picker.selecteds[i] = value.second;
+          if(fixedMinute != null) picker.selecteds[i] = 0;
           break;
         case 6:
           picker.selecteds[i] = (value.hour > 12 || value.hour == 0) ? 1 : 0;
