@@ -1080,13 +1080,13 @@ class DateTimePickerAdapter extends PickerAdapter<DateTime> {
         break;
       case 4:
         if (minuteInterval == null || minuteInterval < 2)
-          _text = "${intToStr(index)}";
-        else
           if(fixedMinute != null) {
             _text = fixedMinute;
           }else {
-            _text = "${intToStr(index * minuteInterval)}";
+            _text = "${intToStr(index)}";
           }
+        else
+          _text = "${intToStr(index * minuteInterval)}";
         break;
       case 6:
         List _ampm = strAMPM ?? PickerLocalizations.of(context).ampm;
